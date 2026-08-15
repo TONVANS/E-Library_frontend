@@ -20,7 +20,7 @@ export function DocumentCard({ document, staggerClass = '' }: DocumentCardProps)
 
   const handlePreviewClick = (e: React.MouseEvent) => {
     e.preventDefault();
-    const apiBase = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+    const apiBase = process.env.NEXT_PUBLIC_API_URL || 'https://training-api.edl.com.la/elibrary';
     const url = document.fileUrl?.startsWith('http') ? document.fileUrl : `${apiBase}${document.fileUrl}`;
     setPreviewUrl(url);
     setIsPreviewOpen(true);

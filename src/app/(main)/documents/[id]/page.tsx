@@ -39,7 +39,7 @@ export default function DocumentDetailPage() {
 
   const handlePreview = () => {
     if (!doc || !doc.fileUrl) return;
-    const apiBase = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+    const apiBase = process.env.NEXT_PUBLIC_API_URL || 'https://training-api.edl.com.la/elibrary';
     const url = doc.fileUrl.startsWith('http') ? doc.fileUrl : `${apiBase}${doc.fileUrl}`;
     setPreviewUrl(url);
     setIsPreviewOpen(true);
@@ -49,7 +49,7 @@ export default function DocumentDetailPage() {
     if (!doc) return;
     setDownloading(true);
     try {
-      const apiBase = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+      const apiBase = process.env.NEXT_PUBLIC_API_URL || 'https://training-api.edl.com.la/elibrary';
       window.open(`${apiBase}/documents/${doc.id}/download`, '_blank');
     } catch (err) {
       console.error('Download error:', err);
