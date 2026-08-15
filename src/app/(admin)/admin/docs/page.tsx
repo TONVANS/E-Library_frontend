@@ -26,6 +26,8 @@ export default function AdminDocsPage() {
   const [submitting, setSubmitting] = useState(false);
 
   // Form State
+  const [fileInput, setFileInput] = useState<File | null>(null);
+  const [coverInput, setCoverInput] = useState<File | null>(null);
   const [formData, setFormData] = useState({
     title: '',
     abstract: '',
@@ -90,6 +92,8 @@ export default function AdminDocsPage() {
   const handleOpenModal = (doc?: Document) => {
     if (doc) {
       setEditingDoc(doc);
+      setFileInput(null);
+      setCoverInput(null);
       setFormData({
         title: doc.title,
         abstract: doc.abstract || '',
@@ -106,6 +110,8 @@ export default function AdminDocsPage() {
       setDepartments(selectedFac?.departments || []);
     } else {
       setEditingDoc(null);
+      setFileInput(null);
+      setCoverInput(null);
       const defaultFacId = user?.facultyId ? String(user.facultyId) : faculties[0]?.id ? String(faculties[0].id) : '';
       setFormData({
         title: '',
@@ -116,7 +122,7 @@ export default function AdminDocsPage() {
         departmentId: '',
         categoryId: categories[0]?.id ? String(categories[0].id) : '',
         tags: '',
-        fileUrl: '/uploads/sample-cloud-optimization.pdf',
+        fileUrl: '',
         coverUrl: '',
       });
       if (defaultFacId) {
@@ -131,25 +137,44 @@ export default function AdminDocsPage() {
     e.preventDefault();
     setSubmitting(true);
     try {
-      const payload = {
-        title: formData.title,
-        abstract: formData.abstract,
-        author: formData.author,
-        publishedYear: Number(formData.publishedYear),
-        facultyId: Number(formData.facultyId),
-        departmentId: formData.departmentId ? Number(formData.departmentId) : undefined,
-        categoryId: Number(formData.categoryId),
-        tags: formData.tags
-          ? formData.tags.split(',').map((t) => t.trim()).filter(Boolean)
-          : [],
-        fileUrl: formData.fileUrl || '/uploads/sample-cloud-optimization.pdf',
-        coverUrl: formData.coverUrl || undefined,
-      };
+      const payload = new FormData();
+      payload.append('title', formData.title);
+      payload.append('abstract', formData.abstract);
+      payload.append('author', formData.author);
+      payload.append('publishedYear', String(formData.publishedYear));
+      payload.append('facultyId', String(formData.facultyId));
+      if (formData.departmentId) {
+        payload.append('departmentId', String(formData.departmentId));
+      }
+      payload.append('categoryId', String(formData.categoryId));
+      
+      if (formData.tags) {
+        const tagsArray = formData.tags.split(',').map((t) => t.trim()).filter(Boolean);
+        if (tagsArray.length > 0) {
+          payload.append('tags', JSON.stringify(tagsArray));
+        }
+      }
+
+      if (fileInput) {
+        payload.append('file', fileInput);
+      } else if (!editingDoc) {
+        alert('ກະລຸນາເລືອກໄຟລ໌ເອກະສານ (PDF)');
+        setSubmitting(false);
+        return;
+      }
+
+      if (coverInput) {
+        payload.append('cover', coverInput);
+      }
 
       if (editingDoc) {
-        await api.patch(`/documents/${editingDoc.id}`, payload);
+        await api.patch(`/documents/${editingDoc.id}`, payload, {
+          headers: { 'Content-Type': 'multipart/form-data' },
+        });
       } else {
-        await api.post('/documents', payload);
+        await api.post('/documents', payload, {
+          headers: { 'Content-Type': 'multipart/form-data' },
+        });
       }
 
       setModalOpen(false);
@@ -469,6 +494,33 @@ export default function AdminDocsPage() {
                   placeholder="ປັນຍາປະດິດ, ພາສາລາວ, NLP"
                   className="w-full p-2.5 rounded-xl border border-slate-200 text-xs text-[#191c1d]"
                 />
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+                <div>
+                  <label className="block font-semibold text-[#191c1d] mb-1">ໄຟລ໌ເອກະສານ (PDF) {!editingDoc && '*'}</label>
+                  <input
+                    type="file"
+                    accept="application/pdf"
+                    onChange={(e) => setFileInput(e.target.files?.[0] || null)}
+                    className="w-full p-2 rounded-xl border border-slate-200 text-xs text-[#191c1d] file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-[#003d9b] hover:file:bg-blue-100"
+                  />
+                  {editingDoc && editingDoc.fileUrl && (
+                    <p className="text-[10px] text-slate-500 mt-1 truncate">ໄຟລ໌ປັດຈຸບັນ: {editingDoc.fileUrl.split('/').pop()}</p>
+                  )}
+                </div>
+                <div>
+                  <label className="block font-semibold text-[#191c1d] mb-1">ຮູບປົກ (Cover)</label>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => setCoverInput(e.target.files?.[0] || null)}
+                    className="w-full p-2 rounded-xl border border-slate-200 text-xs text-[#191c1d] file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-slate-100 file:text-slate-700 hover:file:bg-slate-200"
+                  />
+                  {editingDoc && editingDoc.coverUrl && (
+                    <p className="text-[10px] text-slate-500 mt-1 truncate">ຮູບປົກປັດຈຸບັນ: {editingDoc.coverUrl.split('/').pop()}</p>
+                  )}
+                </div>
               </div>
 
               <div className="flex justify-end gap-3 pt-4 border-t border-slate-100">
