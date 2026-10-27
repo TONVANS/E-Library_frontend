@@ -131,3 +131,19 @@
 .stagger-3 { animation-delay: 150ms; }
 .stagger-4 { animation-delay: 200ms; }
 .stagger-5 { animation-delay: 250ms; }
+
+/* Toast entrance (src/components/ui/Toaster.tsx) */
+@keyframes toastIn {
+  from {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.toast-in {
+  animation: toastIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}

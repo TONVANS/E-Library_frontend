@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { User, Faculty, Role } from '@/types';
 import api from '@/lib/axios';
+import { toast } from '@/store/toastStore';
 import {
   Dialog,
   DialogContent,
@@ -95,7 +96,7 @@ export default function AdminUsersPage() {
     e.preventDefault();
     setSubmitting(true);
     try {
-      await api.post('/users', {
+      const res = await api.post('/users', {
         firstName: formData.firstName,
         lastName: formData.lastName,
         email: formData.email || undefined,
@@ -104,6 +105,11 @@ export default function AdminUsersPage() {
         facultyId: formData.facultyId ? Number(formData.facultyId) : undefined,
         departmentId: formData.departmentId ? Number(formData.departmentId) : undefined,
       });
+      toast.success(
+        'ສ້າງບັນຊີຜູ້ໃຊ້ສຳເລັດ',
+        `ລະຫັດຜູ້ໃຊ້: ${res.data.userCode}` +
+          (res.data.defaultPasswordUsed ? ` · ລະຫັດຜ່ານເລີ່ມຕົ້ນ: ${res.data.defaultPasswordUsed}` : ''),
+      );
 
       setModalOpen(false);
       setFormData({
@@ -117,7 +123,7 @@ export default function AdminUsersPage() {
       });
       fetchUsers();
     } catch (err: any) {
-      alert(err.response?.data?.message || 'ສ້າງຜູ້ໃຊ້ງານບໍ່ສຳເລັດ');
+      toast.apiError(err, 'ສ້າງຜູ້ໃຊ້ງານບໍ່ສຳເລັດ');
     } finally {
       setSubmitting(false);
     }
@@ -137,10 +143,13 @@ export default function AdminUsersPage() {
       await api.patch(`/users/${selectedUserForReset.id}/reset-password`, {
         newPassword: newPassword.trim(),
       });
-      alert('ຣີເຊັດລະຫັດຜ່ານສຳເລັດແລ້ວ!');
+      toast.success(
+        'ຣີເຊັດລະຫັດຜ່ານສຳເລັດແລ້ວ',
+        `${selectedUserForReset.firstName} ${selectedUserForReset.lastName} (${selectedUserForReset.userCode})`,
+      );
       setResetModalOpen(false);
     } catch (err: any) {
-      alert(err.response?.data?.message || 'ຣີເຊັດລະຫັດຜ່ານບໍ່ສຳເລັດ');
+      toast.apiError(err, 'ຣີເຊັດລະຫັດຜ່ານບໍ່ສຳເລັດ');
     } finally {
       setResetting(false);
     }
@@ -155,9 +164,10 @@ export default function AdminUsersPage() {
       return;
     try {
       await api.delete(`/users/${u.id}`);
+      toast.success('ລຶບບັນຊີສຳເລັດ', `${u.firstName} ${u.lastName} (${u.userCode})`);
       fetchUsers();
     } catch (err: any) {
-      alert(err.response?.data?.message || 'ລຶບບັນຊີບໍ່ສຳເລັດ');
+      toast.apiError(err, 'ລຶບບັນຊີບໍ່ສຳເລັດ');
     }
   };
 

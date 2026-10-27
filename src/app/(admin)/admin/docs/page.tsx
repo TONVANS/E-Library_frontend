@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { Document, Faculty, Category, Department } from '@/types';
 import { useAuthStore } from '@/store/authStore';
 import api from '@/lib/axios';
+import { toast } from '@/store/toastStore';
 import {
   Dialog,
   DialogContent,
@@ -27,18 +28,10 @@ import {
   Image as ImageIcon,
   Sparkles,
 } from 'lucide-react';
+import { getFileUrl } from '@/lib/api-config';
 
 export default function AdminDocsPage() {
   const { user } = useAuthStore();
-
-  const apiBase = process.env.NEXT_PUBLIC_API_URL || 'https://training-api.edl.com.la/elibrary';
-
-  const getFullUrl = (path?: string | null) => {
-    if (!path) return '';
-    if (path.startsWith('http')) return path;
-    const normalizedPath = path.replace(/\\/g, '/');
-    return `${apiBase}${normalizedPath.startsWith('/') ? '' : '/'}${normalizedPath}`;
-  };
 
   const [docs, setDocs] = useState<Document[]>([]);
   const [faculties, setFaculties] = useState<Faculty[]>([]);
@@ -199,7 +192,7 @@ export default function AdminDocsPage() {
       if (fileInput) {
         payload.append('file', fileInput);
       } else if (!editingDoc) {
-        alert('ກະລຸນາເລືອກໄຟລ໌ເອກະສານ (PDF)');
+        toast.error('ກະລຸນາເລືອກໄຟລ໌ເອກະສານ (PDF)');
         setSubmitting(false);
         return;
       }
@@ -212,16 +205,18 @@ export default function AdminDocsPage() {
         await api.patch(`/documents/${editingDoc.id}`, payload, {
           headers: { 'Content-Type': 'multipart/form-data' },
         });
+        toast.success('ແກ້ໄຂເອກະສານສຳເລັດ', editingDoc.title);
       } else {
         await api.post('/documents', payload, {
           headers: { 'Content-Type': 'multipart/form-data' },
         });
+        toast.success('ເພີ່ມເອກະສານສຳເລັດ');
       }
 
       setModalOpen(false);
       fetchDocs();
     } catch (err: any) {
-      alert(err.response?.data?.message || 'ບັນທຶກເອກະສານບໍ່ສຳເລັດ');
+      toast.apiError(err, 'ບັນທຶກເອກະສານບໍ່ສຳເລັດ');
     } finally {
       setSubmitting(false);
     }
@@ -231,9 +226,13 @@ export default function AdminDocsPage() {
     const nextStatus = doc.status === 'AVAILABLE' ? 'UNAVAILABLE' : 'AVAILABLE';
     try {
       await api.patch(`/documents/${doc.id}/status`, { status: nextStatus });
+      toast.success(
+        nextStatus === 'AVAILABLE' ? 'ເປີດໃຫ້ເຂົ້າເຖິງເອກະສານແລ້ວ' : 'ປິດການເຂົ້າເຖິງເອກະສານແລ້ວ',
+        doc.title,
+      );
       fetchDocs();
     } catch (err: any) {
-      alert(err.response?.data?.message || 'ປ່ຽນສະຖານະບໍ່ສຳເລັດ');
+      toast.apiError(err, 'ປ່ຽນສະຖານະບໍ່ສຳເລັດ');
     }
   };
 
@@ -241,9 +240,10 @@ export default function AdminDocsPage() {
     if (!confirm(`ທ່ານແນ່ໃຈບໍ່ວ່າຕ້ອງການລຶບເອກະສານ "${doc.title}"?`)) return;
     try {
       await api.delete(`/documents/${doc.id}`);
+      toast.success('ລຶບເອກະສານສຳເລັດ', doc.title);
       fetchDocs();
     } catch (err: any) {
-      alert(err.response?.data?.message || 'ລຶບເອກະສານບໍ່ສຳເລັດ');
+      toast.apiError(err, 'ລຶບເອກະສານບໍ່ສຳເລັດ');
     }
   };
 
@@ -361,7 +361,7 @@ export default function AdminDocsPage() {
                         <div className="w-9 h-11 rounded-lg bg-blue-50 text-[#003d9b] flex items-center justify-center shrink-0 border border-blue-100/80 overflow-hidden shadow-sm">
                           {d.coverUrl ? (
                             <img
-                              src={getFullUrl(d.coverUrl)}
+                              src={getFileUrl(d.coverUrl)}
                               alt=""
                               className="w-full h-full object-cover"
                             />

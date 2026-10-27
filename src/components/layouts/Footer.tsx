@@ -1,14 +1,13 @@
 import React from 'react';
 import Link from 'next/link';
+import { Logo } from '@/components/ui/Logo';
 
 export function Footer() {
   return (
     <footer className="w-full py-12 mt-16 bg-[#ffffff] border-t border-slate-200/70">
       <div className="max-w-[1440px] mx-auto px-6 md:px-12 flex flex-col md:flex-row justify-between items-center gap-6">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-full bg-[#003d9b] text-white flex items-center justify-center font-bold text-sm">
-            <span className="material-symbols-outlined text-lg">school</span>
-          </div>
+          <Logo className="w-10 h-10" />
           <div>
             <h3 className="text-base font-bold text-[#003d9b]">ຫໍສະໝຸດດິຈິຕອນ ມະຫາວິທະຍາໄລແຫ່ງຊາດ</h3>
             <p className="text-xs text-[#434654]">

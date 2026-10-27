@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { Faculty } from '@/types';
 import api from '@/lib/axios';
+import { toast } from '@/store/toastStore';
 import {
   Dialog,
   DialogContent,
@@ -81,11 +82,13 @@ export default function AdminFacultiesPage() {
           name: facName.trim(),
           code: facCode.trim() || undefined,
         });
+        toast.success('ແກ້ໄຂຄະນະສຳເລັດ', facName.trim());
       } else {
         await api.post('/faculties', {
           name: facName.trim(),
           code: facCode.trim() || undefined,
         });
+        toast.success('ເພີ່ມຄະນະສຳເລັດ', facName.trim());
       }
       setFacModalOpen(false);
       setFacName('');
@@ -93,7 +96,7 @@ export default function AdminFacultiesPage() {
       setEditingFac(null);
       fetchFaculties();
     } catch (err: any) {
-      alert(err.response?.data?.message || 'ບັນທຶກຄະນະບໍ່ສຳເລັດ');
+      toast.apiError(err, 'ບັນທຶກຄະນະບໍ່ສຳເລັດ');
     } finally {
       setFacSubmitting(false);
     }
@@ -108,9 +111,10 @@ export default function AdminFacultiesPage() {
       return;
     try {
       await api.delete(`/faculties/${f.id}`);
+      toast.success('ລຶບຄະນະສຳເລັດ', f.name);
       fetchFaculties();
     } catch (err: any) {
-      alert(err.response?.data?.message || 'ລຶບຄະນະບໍ່ສຳເລັດ');
+      toast.apiError(err, 'ລຶບຄະນະບໍ່ສຳເລັດ');
     }
   };
 
@@ -128,11 +132,12 @@ export default function AdminFacultiesPage() {
       await api.post(`/faculties/${selectedFacForDept.id}/departments`, {
         name: deptName.trim(),
       });
+      toast.success('ເພີ່ມພາກວິຊາສຳເລັດ', `${deptName.trim()} · ${selectedFacForDept.name}`);
       setDeptModalOpen(false);
       setDeptName('');
       fetchFaculties();
     } catch (err: any) {
-      alert(err.response?.data?.message || 'ເພີ່ມພາກວິຊາບໍ່ສຳເລັດ');
+      toast.apiError(err, 'ເພີ່ມພາກວິຊາບໍ່ສຳເລັດ');
     } finally {
       setDeptSubmitting(false);
     }
@@ -142,9 +147,10 @@ export default function AdminFacultiesPage() {
     if (!confirm('ທ່ານແນ່ໃຈບໍ່ວ່າຕ້ອງການລຶບພາກວິຊານີ້?')) return;
     try {
       await api.delete(`/faculties/departments/${deptId}`);
+      toast.success('ລຶບພາກວິຊາສຳເລັດ');
       fetchFaculties();
     } catch (err: any) {
-      alert(err.response?.data?.message || 'ລຶບພາກວິຊາບໍ່ສຳເລັດ');
+      toast.apiError(err, 'ລຶບພາກວິຊາບໍ່ສຳເລັດ');
     }
   };
 

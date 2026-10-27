@@ -5,6 +5,8 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuthStore } from '@/store/authStore';
 import api from '@/lib/axios';
+import { Logo } from '@/components/ui/Logo';
+import { toast } from '@/store/toastStore';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -33,8 +35,16 @@ export default function LoginPage() {
       });
 
       setAuth(res.data.user, res.data.accessToken);
+      toast.success(
+        'ເຂົ້າສູ່ລະບົບສຳເລັດ',
+        `ຍິນດີຕ້ອນຮັບ, ${res.data.user.firstName} ${res.data.user.lastName}`,
+      );
 
-      if (res.data.user.role === 'ADMIN') {
+      // Set by src/proxy.ts when it bounced a protected page; only accept in-app paths
+      const redirect = new URLSearchParams(window.location.search).get('redirect');
+      if (redirect && redirect.startsWith('/') && !redirect.startsWith('//')) {
+        router.push(redirect);
+      } else if (res.data.user.role === 'ADMIN') {
         router.push('/admin');
       } else {
         router.push('/');
@@ -62,9 +72,7 @@ export default function LoginPage() {
         {/* Logo & Header */}
         <div className="text-center mb-8">
           <Link href="/" className="inline-flex items-center gap-2 mb-3">
-            <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-[#003d9b] to-[#0052cc] text-white flex items-center justify-center shadow-lg shadow-[#003d9b]/20">
-              <span className="material-symbols-outlined text-2xl">school</span>
-            </div>
+            <Logo priority className="w-20 h-20 shadow-lg shadow-[#003d9b]/20" />
           </Link>
           <h1 className="text-2xl font-bold text-[#003d9b] tracking-tight">ຫໍສະໝຸດດິຈິຕອນ ມຊ</h1>
           <p className="text-xs text-[#737685] mt-1">

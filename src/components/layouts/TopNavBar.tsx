@@ -4,6 +4,8 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/authStore';
+import { Logo } from '@/components/ui/Logo';
+import { toast } from '@/store/toastStore';
 
 export function TopNavBar() {
   const pathname = usePathname();
@@ -28,6 +30,7 @@ export function TopNavBar() {
 
   const handleLogout = () => {
     logout();
+    toast.info('ອອກຈາກລະບົບແລ້ວ');
     setDropdownOpen(false);
     router.push('/login');
   };
@@ -44,9 +47,7 @@ export function TopNavBar() {
       <nav className="fixed top-4 left-1/2 -translate-x-1/2 w-[95%] max-w-[1440px] rounded-full bg-white/75 backdrop-blur-xl shadow-lg shadow-[#003d9b]/10 border border-white/60 z-40 justify-between items-center px-8 md:px-12 py-3 hidden md:flex transition-all">
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2 group">
-          <div className="w-9 h-9 rounded-full bg-gradient-to-tr from-[#003d9b] to-[#0052cc] flex items-center justify-center text-white shadow-md group-hover:scale-105 transition-transform">
-            <span className="material-symbols-outlined text-xl">school</span>
-          </div>
+          <Logo priority className="w-9 h-9 group-hover:scale-105 transition-transform" />
           <span className="text-xl font-bold tracking-tight text-[#003d9b]">
             ຫໍສະໝຸດດິຈິຕອນ <span className="text-[#3a5f94] font-medium">ມຊ (NUOL)</span>
           </span>
@@ -152,9 +153,7 @@ export function TopNavBar() {
       {/* Mobile Top Bar */}
       <div className="md:hidden flex items-center justify-between px-5 py-4 bg-white/90 backdrop-blur-md fixed top-0 w-full z-40 border-b border-slate-200/50 shadow-sm">
         <Link href="/" className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-full bg-[#003d9b] text-white flex items-center justify-center">
-            <span className="material-symbols-outlined text-lg">school</span>
-          </div>
+          <Logo className="w-8 h-8" />
           <span className="text-lg font-bold text-[#003d9b]">ຫໍສະໝຸດດິຈິຕອນ ມຊ</span>
         </Link>
         <button

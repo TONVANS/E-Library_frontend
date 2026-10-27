@@ -7,6 +7,7 @@ import { useAuthStore } from '@/store/authStore';
 import { Document } from '@/types';
 import api from '@/lib/axios';
 import { PdfPreviewModal } from '@/components/ui/PdfPreviewModal';
+import { getFileUrl } from '@/lib/api-config';
 
 export default function DocumentDetailPage() {
   const params = useParams();
@@ -37,18 +38,9 @@ export default function DocumentDetailPage() {
     loadDocument();
   }, [id]);
 
-  const apiBase = process.env.NEXT_PUBLIC_API_URL || 'https://training-api.edl.com.la/elibrary';
-
-  const getFullUrl = (path?: string | null) => {
-    if (!path) return '';
-    if (path.startsWith('http')) return path;
-    const normalizedPath = path.replace(/\\/g, '/');
-    return `${apiBase}${normalizedPath.startsWith('/') ? '' : '/'}${normalizedPath}`;
-  };
-
   const handlePreview = () => {
     if (!doc || !doc.fileUrl) return;
-    const url = getFullUrl(doc.fileUrl);
+    const url = getFileUrl(doc.fileUrl);
     setPreviewUrl(url);
     setIsPreviewOpen(true);
   };
@@ -57,7 +49,7 @@ export default function DocumentDetailPage() {
     if (!doc) return;
     setDownloading(true);
     try {
-      window.open(`${apiBase}/documents/${doc.id}/download`, '_blank');
+      window.open(getFileUrl(`/documents/${doc.id}/download`), '_blank');
     } catch (err) {
       console.error('Download error:', err);
     } finally {
@@ -93,7 +85,7 @@ export default function DocumentDetailPage() {
   }
 
   const coverSrc = doc.coverUrl
-    ? getFullUrl(doc.coverUrl)
+    ? getFileUrl(doc.coverUrl)
     : 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=800&auto=format&fit=crop&q=60';
 
   return (

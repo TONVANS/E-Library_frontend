@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { Category } from '@/types';
 import api from '@/lib/axios';
+import { toast } from '@/store/toastStore';
 import {
   Dialog,
   DialogContent,
@@ -64,15 +65,17 @@ export default function AdminCategoriesPage() {
     try {
       if (editingCat) {
         await api.patch(`/categories/${editingCat.id}`, { name: name.trim() });
+        toast.success('ແກ້ໄຂໝວດໝູ່ສຳເລັດ', name.trim());
       } else {
         await api.post('/categories', { name: name.trim() });
+        toast.success('ເພີ່ມໝວດໝູ່ສຳເລັດ', name.trim());
       }
       setName('');
       setEditingCat(null);
       setModalOpen(false);
       fetchCategories();
     } catch (err: any) {
-      alert(err.response?.data?.message || 'ບັນທຶກໝວດໝູ່ບໍ່ສຳເລັດ');
+      toast.apiError(err, 'ບັນທຶກໝວດໝູ່ບໍ່ສຳເລັດ');
     } finally {
       setSubmitting(false);
     }
@@ -82,9 +85,10 @@ export default function AdminCategoriesPage() {
     if (!confirm(`ທ່ານແນ່ໃຈບໍ່ວ່າຕ້ອງການລຶບໝວດໝູ່ "${c.name}"?`)) return;
     try {
       await api.delete(`/categories/${c.id}`);
+      toast.success('ລຶບໝວດໝູ່ສຳເລັດ', c.name);
       fetchCategories();
     } catch (err: any) {
-      alert(err.response?.data?.message || 'ລຶບໝວດໝູ່ບໍ່ສຳເລັດ');
+      toast.apiError(err, 'ລຶບໝວດໝູ່ບໍ່ສຳເລັດ');
     }
   };
 

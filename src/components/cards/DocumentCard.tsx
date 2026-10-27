@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { PdfPreviewModal } from '@/components/ui/PdfPreviewModal';
 import Link from 'next/link';
 import { Document } from '@/types';
+import { getFileUrl } from '@/lib/api-config';
 
 interface DocumentCardProps {
   document: Document;
@@ -14,22 +15,13 @@ export function DocumentCard({ document, staggerClass = '' }: DocumentCardProps)
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
-  const apiBase = process.env.NEXT_PUBLIC_API_URL || 'https://training-api.edl.com.la/elibrary';
-
-  const getFullUrl = (path?: string | null) => {
-    if (!path) return '';
-    if (path.startsWith('http')) return path;
-    const normalizedPath = path.replace(/\\/g, '/');
-    return `${apiBase}${normalizedPath.startsWith('/') ? '' : '/'}${normalizedPath}`;
-  };
-
   const coverSrc = document.coverUrl
-    ? getFullUrl(document.coverUrl)
+    ? getFileUrl(document.coverUrl)
     : 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=800&auto=format&fit=crop&q=60';
 
   const handlePreviewClick = (e: React.MouseEvent) => {
     e.preventDefault();
-    const url = getFullUrl(document.fileUrl);
+    const url = getFileUrl(document.fileUrl);
     setPreviewUrl(url);
     setIsPreviewOpen(true);
   };

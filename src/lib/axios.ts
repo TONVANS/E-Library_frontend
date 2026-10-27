@@ -1,6 +1,5 @@
 import axios from 'axios';
-
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://training-api.edl.com.la/elibrary';
+import { API_BASE_URL, AUTH_COOKIE, BASE_PATH } from './api-config';
 
 export const api = axios.create({
   baseURL: API_BASE_URL,
@@ -27,9 +26,10 @@ api.interceptors.response.use(
   (error) => {
     if (error.response?.status === 401 && typeof window !== 'undefined') {
       // Don't auto-redirect if we are already on the login page
-      if (!window.location.pathname.startsWith('/login')) {
+      if (!window.location.pathname.startsWith(`${BASE_PATH}/login`)) {
         localStorage.removeItem('nuol_token');
         localStorage.removeItem('nuol_user');
+        document.cookie = `${AUTH_COOKIE}=; path=/; max-age=0`;
       }
     }
     return Promise.reject(error);

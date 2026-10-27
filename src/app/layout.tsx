@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
+import { Toaster } from "@/components/ui/Toaster";
 
 const notoSansLao = localFont({
   src: [
@@ -45,6 +46,7 @@ export default function RootLayout({
         className={`${notoSansLao.className} min-h-screen flex flex-col antialiased bg-[#f8f9fa] text-[#191c1d]`}
       >
         {children}
+        <Toaster />
       </body>
     </html>
   );
