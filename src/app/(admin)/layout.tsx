@@ -4,11 +4,13 @@ import { AdminSidebar } from '@/components/layouts/AdminSidebar';
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="min-h-screen flex flex-col bg-slate-50">
+    <div className="min-h-screen flex flex-col bg-[#f8f9fa]">
       <TopNavBar />
-      <div className="flex flex-grow pt-[75px] md:pt-[95px]">
+      <div className="flex flex-col lg:flex-row flex-grow pt-[72px] md:pt-[88px] min-h-screen">
         <AdminSidebar />
-        <main className="flex-grow p-6 md:p-8 max-w-[1400px] overflow-y-auto">{children}</main>
+        <main className="flex-1 min-w-0 p-4 sm:p-6 lg:p-8 max-w-[1440px] w-full overflow-x-hidden">
+          {children}
+        </main>
       </div>
     </div>
   );

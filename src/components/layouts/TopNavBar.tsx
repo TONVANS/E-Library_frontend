@@ -41,7 +41,7 @@ export function TopNavBar() {
   return (
     <>
       {/* Desktop Floating Glass Navbar */}
-      <nav className="fixed top-4 left-1/2 -translate-x-1/2 w-[95%] max-w-[1440px] rounded-full bg-white/75 backdrop-blur-xl shadow-lg shadow-[#003d9b]/10 border border-white/60 z-50 justify-between items-center px-8 md:px-12 py-3 hidden md:flex transition-all">
+      <nav className="fixed top-4 left-1/2 -translate-x-1/2 w-[95%] max-w-[1440px] rounded-full bg-white/75 backdrop-blur-xl shadow-lg shadow-[#003d9b]/10 border border-white/60 z-40 justify-between items-center px-8 md:px-12 py-3 hidden md:flex transition-all">
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2 group">
           <div className="w-9 h-9 rounded-full bg-gradient-to-tr from-[#003d9b] to-[#0052cc] flex items-center justify-center text-white shadow-md group-hover:scale-105 transition-transform">
@@ -150,7 +150,7 @@ export function TopNavBar() {
       </nav>
 
       {/* Mobile Top Bar */}
-      <div className="md:hidden flex items-center justify-between px-5 py-4 bg-white/90 backdrop-blur-md fixed top-0 w-full z-50 border-b border-slate-200/50 shadow-sm">
+      <div className="md:hidden flex items-center justify-between px-5 py-4 bg-white/90 backdrop-blur-md fixed top-0 w-full z-40 border-b border-slate-200/50 shadow-sm">
         <Link href="/" className="flex items-center gap-2">
           <div className="w-8 h-8 rounded-full bg-[#003d9b] text-white flex items-center justify-center">
             <span className="material-symbols-outlined text-lg">school</span>
@@ -169,7 +169,7 @@ export function TopNavBar() {
 
       {/* Mobile Drawer */}
       {mobileMenuOpen && (
-        <div className="md:hidden fixed inset-0 top-[60px] bg-white/95 backdrop-blur-xl z-40 p-6 flex flex-col justify-between animate-in slide-in-from-top-4 duration-200">
+        <div className="md:hidden fixed inset-0 top-[60px] bg-white/95 backdrop-blur-xl z-30 p-6 flex flex-col justify-between animate-in slide-in-from-top-4 duration-200">
           <div className="space-y-4">
             {navLinks.map((link) => (
               <Link

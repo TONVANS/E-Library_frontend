@@ -37,10 +37,18 @@ export default function DocumentDetailPage() {
     loadDocument();
   }, [id]);
 
+  const apiBase = process.env.NEXT_PUBLIC_API_URL || 'https://training-api.edl.com.la/elibrary';
+
+  const getFullUrl = (path?: string | null) => {
+    if (!path) return '';
+    if (path.startsWith('http')) return path;
+    const normalizedPath = path.replace(/\\/g, '/');
+    return `${apiBase}${normalizedPath.startsWith('/') ? '' : '/'}${normalizedPath}`;
+  };
+
   const handlePreview = () => {
     if (!doc || !doc.fileUrl) return;
-    const apiBase = process.env.NEXT_PUBLIC_API_URL || 'https://training-api.edl.com.la/elibrary';
-    const url = doc.fileUrl.startsWith('http') ? doc.fileUrl : `${apiBase}${doc.fileUrl}`;
+    const url = getFullUrl(doc.fileUrl);
     setPreviewUrl(url);
     setIsPreviewOpen(true);
   };
@@ -49,7 +57,6 @@ export default function DocumentDetailPage() {
     if (!doc) return;
     setDownloading(true);
     try {
-      const apiBase = process.env.NEXT_PUBLIC_API_URL || 'https://training-api.edl.com.la/elibrary';
       window.open(`${apiBase}/documents/${doc.id}/download`, '_blank');
     } catch (err) {
       console.error('Download error:', err);
@@ -85,9 +92,9 @@ export default function DocumentDetailPage() {
     );
   }
 
-  const coverSrc =
-    doc.coverUrl ||
-    'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=800&auto=format&fit=crop&q=60';
+  const coverSrc = doc.coverUrl
+    ? getFullUrl(doc.coverUrl)
+    : 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=800&auto=format&fit=crop&q=60';
 
   return (
     <div className="max-w-[1280px] mx-auto px-4 md:px-12 py-8 fade-in-up">
