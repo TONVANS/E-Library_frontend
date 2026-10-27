@@ -1,6 +1,12 @@
 import React from 'react';
 import { TopNavBar } from '@/components/layouts/TopNavBar';
 import { AdminSidebar } from '@/components/layouts/AdminSidebar';
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'ລະບົບຜູ້ດູແລ',
+  robots: { index: false, follow: false },
+};
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   return (

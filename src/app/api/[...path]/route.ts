@@ -1,11 +1,6 @@
 import type { NextRequest } from 'next/server';
 import { AUTH_COOKIE } from '@/lib/api-config';
-
-const BACKEND_URL = (
-  process.env.API_URL ||
-  process.env.NEXT_PUBLIC_API_URL ||
-  'https://training-api.edl.com.la/elibrary'
-).replace(/\/$/, '');
+import { getBackendUrl } from '@/lib/backend';
 
 // Hop-by-hop headers and ones that fetch() recomputes; forwarding them breaks the proxied request/response
 const STRIP_REQUEST_HEADERS = ['host', 'connection', 'content-length', 'accept-encoding', 'cookie'];
@@ -13,7 +8,7 @@ const STRIP_RESPONSE_HEADERS = ['connection', 'content-encoding', 'content-lengt
 
 async function forward(request: NextRequest, { params }: RouteContext<'/api/[...path]'>) {
   const { path } = await params;
-  const target = `${BACKEND_URL}/${path.map(encodeURIComponent).join('/')}${request.nextUrl.search}`;
+  const target = `${getBackendUrl()}/${path.map(encodeURIComponent).join('/')}${request.nextUrl.search}`;
 
   const headers = new Headers(request.headers);
   STRIP_REQUEST_HEADERS.forEach((h) => headers.delete(h));
