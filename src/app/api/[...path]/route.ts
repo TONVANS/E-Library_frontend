@@ -8,7 +8,16 @@ const STRIP_RESPONSE_HEADERS = ['connection', 'content-encoding', 'content-lengt
 
 async function forward(request: NextRequest, { params }: RouteContext<'/api/[...path]'>) {
   const { path } = await params;
-  const target = `${getBackendUrl()}/${path.map(encodeURIComponent).join('/')}${request.nextUrl.search}`;
+
+  let backendUrl: string;
+  try {
+    backendUrl = getBackendUrl();
+  } catch (err) {
+    // Full reason goes to the server log (Cloudflare Workers Logs); the client only learns it's a config problem
+    console.error(err);
+    return Response.json({ message: 'API proxy is not configured' }, { status: 503 });
+  }
+  const target = `${backendUrl}/${path.map(encodeURIComponent).join('/')}${request.nextUrl.search}`;
 
   const headers = new Headers(request.headers);
   STRIP_REQUEST_HEADERS.forEach((h) => headers.delete(h));
