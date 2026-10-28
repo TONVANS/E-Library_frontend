@@ -157,7 +157,7 @@ export function TopNavBar() {
       <div className="md:hidden flex items-center justify-between px-5 py-4 bg-white/90 backdrop-blur-md fixed top-0 w-full z-40 border-b border-slate-200/50 shadow-sm">
         <Link href="/" className="flex items-center gap-2">
           <Logo className="w-8 h-8" />
-          <span className="text-lg font-bold text-[#003d9b]">ຫໍສະໝຸດດິຈິຕອນ ມຊ</span>
+          <span className="text-lg font-bold text-[#003d9b]">ຫໍສະໝຸດດິຈິຕອນ ຄສບ (FEB)</span>
         </Link>
         <button
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}

@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 
-interface FilterState {
+export interface FilterValues {
   searchQuery: string;
   selectedCategoryId: number | null;
   selectedFacultyId: number | null;
@@ -8,6 +8,11 @@ interface FilterState {
   selectedYear: number | null;
   selectedTag: string | null;
   page: number;
+}
+
+interface FilterState extends FilterValues {
+  // Replaces every filter at once (used when restoring filters from the URL)
+  setFilters: (filters: FilterValues) => void;
   setSearchQuery: (query: string) => void;
   setSelectedCategoryId: (id: number | null) => void;
   setSelectedFacultyId: (id: number | null) => void;
@@ -27,6 +32,7 @@ export const useFilterStore = create<FilterState>((set) => ({
   selectedTag: null,
   page: 1,
 
+  setFilters: (filters) => set(filters),
   setSearchQuery: (searchQuery) => set({ searchQuery, page: 1 }),
   setSelectedCategoryId: (selectedCategoryId) => set({ selectedCategoryId, page: 1 }),
   setSelectedFacultyId: (selectedFacultyId) => set({ selectedFacultyId, selectedDepartmentId: null, page: 1 }),

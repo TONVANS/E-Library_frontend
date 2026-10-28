@@ -1,65 +1,27 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useRef } from 'react';
 import Link from 'next/link';
 import { Logo } from '@/components/ui/Logo';
 import { SearchBar } from '@/components/ui/SearchBar';
 import { FilterChips } from '@/components/ui/FilterChips';
+import { Pagination } from '@/components/ui/Pagination';
 import { DocumentCard } from '@/components/cards/DocumentCard';
 import { useAuthStore } from '@/store/authStore';
-import { useFilterStore } from '@/store/filterStore';
-import { Document, Faculty, Category } from '@/types';
-import api from '@/lib/axios';
+import { isFacultyLocked, useCatalogMeta, useDocumentCatalog } from '@/hooks/useDocumentCatalog';
+
+const PAGE_SIZE = 9;
 
 export default function HomePage() {
   const { user, isAuthenticated } = useAuthStore();
-  const { searchQuery, selectedCategoryId, selectedFacultyId, selectedYear } = useFilterStore();
+  const { faculties, categories, years } = useCatalogMeta();
+  const { documents, totalPages, loading, page, setPage } = useDocumentCatalog(PAGE_SIZE);
 
-  const [documents, setDocuments] = useState<Document[]>([]);
-  const [faculties, setFaculties] = useState<Faculty[]>([]);
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  // Fetch initial faculties and categories
-  useEffect(() => {
-    async function loadMeta() {
-      try {
-        const [facRes, catRes] = await Promise.all([
-          api.get('/faculties'),
-          api.get('/categories'),
-        ]);
-        setFaculties(facRes.data);
-        setCategories(catRes.data);
-      } catch (err) {
-        console.error('Error loading metadata:', err);
-      }
-    }
-    loadMeta();
-  }, []);
-
-  // Fetch documents whenever filters change
-  useEffect(() => {
-    async function loadDocuments() {
-      setLoading(true);
-      try {
-        const params: any = {
-          limit: 6,
-          search: searchQuery || undefined,
-          categoryId: selectedCategoryId || undefined,
-          facultyId: selectedFacultyId || undefined,
-          publishedYear: selectedYear || undefined,
-        };
-
-        const res = await api.get('/documents', { params });
-        setDocuments(res.data.data);
-      } catch (err) {
-        console.error('Error fetching documents:', err);
-      } finally {
-        setLoading(false);
-      }
-    }
-    loadDocuments();
-  }, [searchQuery, selectedCategoryId, selectedFacultyId, selectedYear]);
+  const resultsRef = useRef<HTMLElement>(null);
+  const handlePageChange = (next: number) => {
+    setPage(next);
+    resultsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
 
   return (
     <div className="w-full">
@@ -89,16 +51,17 @@ export default function HomePage() {
           </div>
 
           {/* Filter Chips */}
+          {/* Faculty-locked users only ever get their own faculty, so faculty chips would be no-ops */}
           <FilterChips
             categories={categories}
-            faculties={faculties}
-            years={[2025, 2024, 2023, 2022]}
+            faculties={isFacultyLocked(user) ? [] : faculties}
+            years={years}
           />
         </div>
       </section>
 
       {/* Main Content Section */}
-      <section className="max-w-[1440px] mx-auto px-4 md:px-12 mb-16">
+      <section ref={resultsRef} className="max-w-[1440px] mx-auto px-4 md:px-12 mb-16 scroll-mt-24">
         {/* Section Header */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end mb-8 gap-2">
           <div>
@@ -128,7 +91,7 @@ export default function HomePage() {
         {/* Documents Grid */}
         {loading ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {[1, 2, 3, 4, 5, 6].map((n) => (
+            {Array.from({ length: PAGE_SIZE }, (_, n) => (
               <div key={n} className="h-96 rounded-2xl bg-white border border-slate-100 p-6 animate-pulse flex flex-col justify-between">
                 <div className="h-44 bg-slate-200 rounded-xl" />
                 <div className="space-y-3 mt-4">
@@ -161,6 +124,8 @@ export default function HomePage() {
             ))}
           </div>
         )}
+
+        <Pagination page={page} totalPages={totalPages} onPageChange={handlePageChange} />
       </section>
     </div>
   );

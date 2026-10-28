@@ -1,12 +1,20 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { Suspense, useEffect, useRef, useState } from 'react';
 import { DocumentCard } from '@/components/cards/DocumentCard';
+import { Pagination } from '@/components/ui/Pagination';
+import { useAuthStore } from '@/store/authStore';
 import { useFilterStore } from '@/store/filterStore';
-import { Document, Faculty, Category } from '@/types';
-import api from '@/lib/axios';
+import { isFacultyLocked, useCatalogMeta, useDocumentCatalog } from '@/hooks/useDocumentCatalog';
+import { useFilterUrlSync } from '@/hooks/useFilterUrlSync';
 
-export default function DocumentsCatalogPage() {
+const PAGE_SIZE = 9;
+const SEARCH_DEBOUNCE_MS = 400;
+
+function DocumentsCatalog() {
+  useFilterUrlSync();
+
+  const { user } = useAuthStore();
   const {
     searchQuery,
     setSearchQuery,
@@ -14,63 +22,51 @@ export default function DocumentsCatalogPage() {
     setSelectedCategoryId,
     selectedFacultyId,
     setSelectedFacultyId,
+    selectedDepartmentId,
+    setSelectedDepartmentId,
     selectedYear,
     setSelectedYear,
-    page,
-    setPage,
     resetFilters,
   } = useFilterStore();
 
-  const [documents, setDocuments] = useState<Document[]>([]);
-  const [faculties, setFaculties] = useState<Faculty[]>([]);
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [totalPages, setTotalPages] = useState(1);
-  const [totalItems, setTotalItems] = useState(0);
-  const [loading, setLoading] = useState(true);
+  const { faculties, categories, years } = useCatalogMeta();
+  const { documents, totalPages, totalItems, loading, page, setPage } =
+    useDocumentCatalog(PAGE_SIZE);
 
-  // Load Metadata
+  // Non-admin users are limited to their own faculty by the backend, so the select is fixed
+  const facultyLocked = isFacultyLocked(user);
+  const effectiveFacultyId = facultyLocked ? user!.facultyId! : selectedFacultyId;
+  const departments = faculties.find((f) => f.id === effectiveFacultyId)?.departments ?? [];
+
+  // Debounce typing so every keystroke doesn't hit the API
+  const [searchInput, setSearchInput] = useState(searchQuery);
+  // Follow external changes to the query (reset button, URL) without an extra effect
+  const [syncedQuery, setSyncedQuery] = useState(searchQuery);
+  if (searchQuery !== syncedQuery) {
+    setSyncedQuery(searchQuery);
+    setSearchInput(searchQuery);
+  }
   useEffect(() => {
-    async function loadMeta() {
-      try {
-        const [facRes, catRes] = await Promise.all([
-          api.get('/faculties'),
-          api.get('/categories'),
-        ]);
-        setFaculties(facRes.data);
-        setCategories(catRes.data);
-      } catch (err) {
-        console.error(err);
-      }
-    }
-    loadMeta();
-  }, []);
+    if (searchInput === searchQuery) return;
+    const timer = setTimeout(() => setSearchQuery(searchInput), SEARCH_DEBOUNCE_MS);
+    return () => clearTimeout(timer);
+  }, [searchInput, searchQuery, setSearchQuery]);
 
-  // Load Catalog
-  useEffect(() => {
-    async function fetchCatalog() {
-      setLoading(true);
-      try {
-        const params: any = {
-          page,
-          limit: 9,
-          search: searchQuery || undefined,
-          categoryId: selectedCategoryId || undefined,
-          facultyId: selectedFacultyId || undefined,
-          publishedYear: selectedYear || undefined,
-        };
+  const resultsRef = useRef<HTMLDivElement>(null);
+  const handlePageChange = (next: number) => {
+    setPage(next);
+    resultsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
 
-        const res = await api.get('/documents', { params });
-        setDocuments(res.data.data);
-        setTotalPages(res.data.meta.totalPages || 1);
-        setTotalItems(res.data.meta.total || 0);
-      } catch (err) {
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    }
-    fetchCatalog();
-  }, [page, searchQuery, selectedCategoryId, selectedFacultyId, selectedYear]);
+  const hasActiveFilters =
+    !!searchQuery ||
+    selectedCategoryId !== null ||
+    (!facultyLocked && selectedFacultyId !== null) ||
+    selectedDepartmentId !== null ||
+    selectedYear !== null;
+
+  const rangeStart = totalItems === 0 ? 0 : (page - 1) * PAGE_SIZE + 1;
+  const rangeEnd = Math.min(page * PAGE_SIZE, totalItems);
 
   return (
     <div className="max-w-[1440px] mx-auto px-4 md:px-12 py-6">
@@ -91,11 +87,27 @@ export default function DocumentsCatalogPage() {
             </span>
             <input
               type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') setSearchQuery(searchInput);
+              }}
               placeholder="ຄົ້ນຫາຫົວຂໍ້, ຊື່ຜູ້ຂຽນ..."
-              className="w-full pl-9 pr-4 py-2 rounded-full bg-white/90 backdrop-blur-md text-xs text-[#191c1d] placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-300"
+              className="w-full pl-9 pr-9 py-2 rounded-full bg-white/90 backdrop-blur-md text-xs text-[#191c1d] placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-300"
             />
+            {searchInput && (
+              <button
+                type="button"
+                onClick={() => {
+                  setSearchInput('');
+                  setSearchQuery('');
+                }}
+                className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-slate-600 rounded-full flex"
+                aria-label="ລ້າງຄຳຄົ້ນຫາ"
+              >
+                <span className="material-symbols-outlined text-sm">close</span>
+              </button>
+            )}
           </div>
         </div>
       </div>
@@ -110,7 +122,8 @@ export default function DocumentsCatalogPage() {
               </h3>
               <button
                 onClick={resetFilters}
-                className="text-[11px] font-semibold text-red-600 hover:underline"
+                disabled={!hasActiveFilters}
+                className="text-[11px] font-semibold text-red-600 hover:underline disabled:text-slate-300 disabled:no-underline"
               >
                 ລ້າງຄ່າ
               </button>
@@ -120,11 +133,12 @@ export default function DocumentsCatalogPage() {
             <div>
               <label className="block text-xs font-semibold text-[#434654] mb-2">ສັງກັດຄະນະ</label>
               <select
-                value={selectedFacultyId || ''}
+                value={effectiveFacultyId ?? ''}
+                disabled={facultyLocked}
                 onChange={(e) =>
                   setSelectedFacultyId(e.target.value ? Number(e.target.value) : null)
                 }
-                className="w-full p-2.5 rounded-xl border border-slate-200 bg-slate-50/50 text-xs text-[#191c1d] focus:outline-none focus:ring-2 focus:ring-[#0052cc]/30"
+                className="w-full p-2.5 rounded-xl border border-slate-200 bg-slate-50/50 text-xs text-[#191c1d] focus:outline-none focus:ring-2 focus:ring-[#0052cc]/30 disabled:opacity-70 disabled:cursor-not-allowed"
               >
                 <option value="">ທຸກຄະນະ (All Faculties)</option>
                 {faculties.map((f) => (
@@ -133,7 +147,33 @@ export default function DocumentsCatalogPage() {
                   </option>
                 ))}
               </select>
+              {facultyLocked && (
+                <p className="text-[11px] text-[#737685] mt-1.5">
+                  ສະແດງສະເພາະເອກະສານຂອງຄະນະທ່ານ
+                </p>
+              )}
             </div>
+
+            {/* Department Filter (depends on the selected faculty) */}
+            {departments.length > 0 && (
+              <div>
+                <label className="block text-xs font-semibold text-[#434654] mb-2">ພາກວິຊາ</label>
+                <select
+                  value={selectedDepartmentId ?? ''}
+                  onChange={(e) =>
+                    setSelectedDepartmentId(e.target.value ? Number(e.target.value) : null)
+                  }
+                  className="w-full p-2.5 rounded-xl border border-slate-200 bg-slate-50/50 text-xs text-[#191c1d] focus:outline-none focus:ring-2 focus:ring-[#0052cc]/30"
+                >
+                  <option value="">ທຸກພາກວິຊາ</option>
+                  {departments.map((d) => (
+                    <option key={d.id} value={d.id}>
+                      {d.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
 
             {/* Category Filter */}
             <div>
@@ -173,26 +213,35 @@ export default function DocumentsCatalogPage() {
                 ປີທີ່ພິມເຜີຍແຜ່
               </label>
               <select
-                value={selectedYear || ''}
+                value={selectedYear ?? ''}
                 onChange={(e) => setSelectedYear(e.target.value ? Number(e.target.value) : null)}
                 className="w-full p-2.5 rounded-xl border border-slate-200 bg-slate-50/50 text-xs text-[#191c1d] focus:outline-none focus:ring-2 focus:ring-[#0052cc]/30"
               >
                 <option value="">ທຸກໆປີ</option>
-                {[2025, 2024, 2023, 2022, 2021, 2020].map((yr) => (
-                  <option key={yr} value={yr}>
-                    ປີ {yr}
-                  </option>
-                ))}
+                {/* Keep a year that came from the URL selectable even if it has no documents */}
+                {(selectedYear && !years.includes(selectedYear) ? [selectedYear, ...years] : years).map(
+                  (yr) => (
+                    <option key={yr} value={yr}>
+                      ປີ {yr}
+                    </option>
+                  ),
+                )}
               </select>
             </div>
           </div>
         </aside>
 
         {/* Right Main Grid */}
-        <div className="lg:col-span-3 space-y-6">
+        <div ref={resultsRef} className="lg:col-span-3 space-y-6 scroll-mt-24">
+          {!loading && totalItems > 0 && (
+            <p className="text-xs text-[#737685]">
+              ສະແດງ {rangeStart}–{rangeEnd} ຈາກ {totalItems} ລາຍການ
+            </p>
+          )}
+
           {loading ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {[1, 2, 3, 4, 5, 6].map((n) => (
+              {Array.from({ length: PAGE_SIZE }, (_, n) => (
                 <div
                   key={n}
                   className="h-96 rounded-2xl bg-white border border-slate-100 p-6 animate-pulse flex flex-col justify-between"
@@ -230,30 +279,18 @@ export default function DocumentsCatalogPage() {
             </div>
           )}
 
-          {/* Pagination Controls */}
-          {totalPages > 1 && (
-            <div className="flex justify-center items-center gap-2 pt-6">
-              <button
-                disabled={page <= 1}
-                onClick={() => setPage(page - 1)}
-                className="px-4 py-2 rounded-xl bg-white border border-slate-200 text-xs font-semibold text-[#191c1d] disabled:opacity-40 hover:bg-slate-50 transition-all shadow-sm"
-              >
-                ໜ້າກ່ອນໜ້າ
-              </button>
-              <span className="text-xs font-semibold text-[#434654] px-3">
-                ໜ້າທີ {page} ຈາກທັງໝົດ {totalPages}
-              </span>
-              <button
-                disabled={page >= totalPages}
-                onClick={() => setPage(page + 1)}
-                className="px-4 py-2 rounded-xl bg-white border border-slate-200 text-xs font-semibold text-[#191c1d] disabled:opacity-40 hover:bg-slate-50 transition-all shadow-sm"
-              >
-                ໜ້າຖັດໄປ
-              </button>
-            </div>
-          )}
+          <Pagination page={page} totalPages={totalPages} onPageChange={handlePageChange} />
         </div>
       </div>
     </div>
+  );
+}
+
+// useSearchParams (via useFilterUrlSync) needs a Suspense boundary for prerendering
+export default function DocumentsCatalogPage() {
+  return (
+    <Suspense fallback={null}>
+      <DocumentsCatalog />
+    </Suspense>
   );
 }
