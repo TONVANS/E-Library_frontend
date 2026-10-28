@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { Logo } from '@/components/ui/Logo';
 import { SearchBar } from '@/components/ui/SearchBar';
 import { FilterChips } from '@/components/ui/FilterChips';
 import { DocumentCard } from '@/components/cards/DocumentCard';
@@ -65,13 +66,17 @@ export default function HomePage() {
       {/* Hero Section with Academic Prestige Gradient */}
       <section className="w-full px-4 md:px-12 mb-12 fade-in-up">
         <div className="max-w-[1440px] mx-auto premium-gradient-bg rounded-3xl p-8 md:p-16 text-center text-white shadow-xl shadow-[#003d9b]/25 relative">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-[#ffe088] text-xs font-semibold mb-6">
-            <span className="material-symbols-outlined text-sm">auto_stories</span>
-            <span>ລະບົບຄັງເອກະສານວິຊາການ ມະຫາວິທະຍາໄລແຫ່ງຊາດ (ມຊ)</span>
+          
+          {/* Section brand */}
+          <div className="flex justify-center mb-6">
+            <Logo
+              priority
+              className="w-28 h-28 md:w-36 md:h-36 shadow-2xl ring-4 ring-white/30 hover:scale-105 transition-transform duration-300"
+            />
           </div>
 
           <h1 className="text-3xl md:text-5xl font-extrabold tracking-tight text-white mb-4 drop-shadow-md leading-tight">
-            ຄົ້ນຫາ ບົດວິທະຍານິພົນຂອງ ຄະນະເສດຖະສາດ ແລະ ບໍລິຫານທຸລະກິດ
+            ຄົ້ນຫາ ບົດວິທະຍານິພົນ <br></br> ຄະນະເສດຖະສາດ ແລະ ບໍລິຫານທຸລະກິດ
           </h1>
 
           <p className="text-base md:text-lg text-[#dae2ff] mb-8 max-w-2xl mx-auto opacity-95 leading-relaxed font-normal">

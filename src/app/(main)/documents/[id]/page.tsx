@@ -114,7 +114,7 @@ export default function DocumentDetailPage() {
                   {doc.category.name}
                 </span>
               )}
-              {doc.status === 'AVAILABLE' ? (
+              {/* {doc.status === 'AVAILABLE' ? (
                 <span className="bg-emerald-50 text-emerald-700 text-xs font-bold px-3 py-1 rounded-full">
                   ເອກະສານທາງການ ມຊ
                 </span>
@@ -122,7 +122,7 @@ export default function DocumentDetailPage() {
                 <span className="bg-red-50 text-red-700 text-xs font-bold px-3 py-1 rounded-full">
                   ຈຳກັດການເຂົ້າເຖິງ
                 </span>
-              )}
+              )} */}
             </div>
 
             <h1 className="text-2xl md:text-3xl font-extrabold text-[#003d9b] tracking-tight mb-4 leading-snug">

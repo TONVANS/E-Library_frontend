@@ -44,7 +44,7 @@ export function DocumentCard({ document, staggerClass = '' }: DocumentCardProps)
         <div className="absolute top-3 right-3 flex items-center gap-1.5">
           {document.status === 'AVAILABLE' ? (
             <span className="bg-[#cba72f] text-[#4e3d00] text-[11px] font-bold px-2.5 py-0.5 rounded-full shadow-sm">
-              ເປີດໃຫ້ບໍລິການ
+              ເປີດໃຫ້ເຂົ້າອ່ານ
             </span>
           ) : (
             <span className="bg-red-500 text-white text-[11px] font-bold px-2.5 py-0.5 rounded-full shadow-sm">

@@ -9,9 +9,9 @@ export function Footer() {
         <div className="flex items-center gap-3">
           <Logo className="w-10 h-10" />
           <div>
-            <h3 className="text-base font-bold text-[#003d9b]">ຫໍສະໝຸດດິຈິຕອນ ມະຫາວິທະຍາໄລແຫ່ງຊາດ</h3>
+            <h3 className="text-base font-bold text-[#003d9b]">ຄະນະເສດຖະສາດ ແລະ ບໍລິຫານທຸລະກິດ</h3>
             <p className="text-xs text-[#434654]">
-              National University of Laos E-Library System
+              Faculty of Economics and Business Management
             </p>
           </div>
         </div>

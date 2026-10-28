@@ -74,9 +74,11 @@ export default function LoginPage() {
           <Link href="/" className="inline-flex items-center gap-2 mb-3">
             <Logo priority className="w-20 h-20 shadow-lg shadow-[#003d9b]/20" />
           </Link>
-          <h1 className="text-2xl font-bold text-[#003d9b] tracking-tight">ຫໍສະໝຸດດິຈິຕອນ ມຊ</h1>
+          <h1 className="text-2xl font-bold text-[#003d9b] tracking-tight">
+            ຄະນະເສດຖະສາດ ແລະ ບໍລິຫານທຸລະກິດ
+          </h1>
           <p className="text-xs text-[#737685] mt-1">
-            ລະບົບຄັງເອກະສານວິຊາການ ແລະ ບົດຄົ້ນຄວ້າ ມະຫາວິທະຍາໄລແຫ່ງຊາດ
+            Faculty of Economics and Business Management
           </p>
         </div>
 
@@ -96,7 +98,7 @@ export default function LoginPage() {
         >
           <div>
             <label className="block text-xs font-semibold text-[#191c1d] mb-1.5 uppercase tracking-wider">
-              ລະຫັດຜູ້ໃຊ້ງານ (User Code ເຊັ່ນ: AD001, TC001, ST001)
+              ລະຫັດຜູ້ໃຊ້ງານ
             </label>
             <div className="relative">
               <span className="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-lg">
