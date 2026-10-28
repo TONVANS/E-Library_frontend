@@ -15,7 +15,8 @@ const PAGE_SIZE = 9;
 export default function HomePage() {
   const { user, isAuthenticated } = useAuthStore();
   const { faculties, categories, years } = useCatalogMeta();
-  const { documents, totalPages, loading, page, setPage } = useDocumentCatalog(PAGE_SIZE);
+  const { documents, totalPages, totalItems, loading, page, setPage } =
+    useDocumentCatalog(PAGE_SIZE);
 
   const resultsRef = useRef<HTMLElement>(null);
   const handlePageChange = (next: number) => {
@@ -125,7 +126,9 @@ export default function HomePage() {
           </div>
         )}
 
-        <Pagination page={page} totalPages={totalPages} onPageChange={handlePageChange} />
+        {totalItems > 0 && (
+          <Pagination page={page} totalPages={totalPages} onPageChange={handlePageChange} />
+        )}
       </section>
     </div>
   );

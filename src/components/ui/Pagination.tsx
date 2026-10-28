@@ -25,7 +25,8 @@ function getPageItems(page: number, totalPages: number): (number | null)[] {
 }
 
 export function Pagination({ page, totalPages, onPageChange, className = '' }: PaginationProps) {
-  if (totalPages <= 1) return null;
+  // Shown even for a single page so users can see there is nothing more to browse
+  if (totalPages < 1) return null;
 
   const navBtn =
     'h-9 px-3 rounded-xl bg-white border border-slate-200 text-xs font-semibold text-[#191c1d] disabled:opacity-40 disabled:cursor-not-allowed hover:bg-slate-50 transition-all shadow-sm flex items-center gap-1';

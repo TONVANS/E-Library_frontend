@@ -279,7 +279,9 @@ function DocumentsCatalog() {
             </div>
           )}
 
-          <Pagination page={page} totalPages={totalPages} onPageChange={handlePageChange} />
+          {totalItems > 0 && (
+            <Pagination page={page} totalPages={totalPages} onPageChange={handlePageChange} />
+          )}
         </div>
       </div>
     </div>
