@@ -17,7 +17,7 @@ export function Footer() {
         </div>
 
         <div className="text-xs text-[#737685] text-center md:text-left">
-          © {new Date().getFullYear()} ມະຫາວິທະຍາໄລແຫ່ງຊາດ (ມຊ). ສະຫງວນລິຂະສິດທຸກປະການ.
+          © {new Date().getFullYear()} ຄະນະເສດຖະສາດ ແລະ ບໍລິຫານທຸລະກິດ ມະຫາວິທະຍາໄລແຫ່ງຊາດ (ມຊ). ສະຫງວນລິຂະສິດທຸກປະການ.
         </div>
 
         <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 text-xs font-medium text-[#434654]">

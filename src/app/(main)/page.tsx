@@ -76,7 +76,7 @@ export default function HomePage() {
           </div>
 
           <h1 className="text-3xl md:text-5xl font-extrabold tracking-tight text-white mb-4 drop-shadow-md leading-tight">
-            ຄົ້ນຫາ ບົດວິທະຍານິພົນ <br></br> ຄະນະເສດຖະສາດ ແລະ ບໍລິຫານທຸລະກິດ
+            ຄົ້ນຫາ ວິທະຍານິພົນ <br></br> ຄະນະເສດຖະສາດ ແລະ ບໍລິຫານທຸລະກິດ
           </h1>
 
           <p className="text-base md:text-lg text-[#dae2ff] mb-8 max-w-2xl mx-auto opacity-95 leading-relaxed font-normal">
