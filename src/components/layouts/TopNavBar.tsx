@@ -48,9 +48,12 @@ export function TopNavBar() {
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2 group">
           <Logo priority className="w-9 h-9 group-hover:scale-105 transition-transform" />
-          <span className="text-xl font-bold tracking-tight text-[#003d9b]">
-            ຫໍສະໝຸດດິຈິຕອນ <span className="text-[#3a5f94] font-medium">ມຊ (NUOL)</span>
-          </span>
+          <div className="flex flex-col leading-tight">
+            <span className="text-xl font-bold tracking-tight text-[#003d9b]">
+              ຫໍສະໝຸດດິຈິຕອນ ຄສບ (FEB)
+            </span>
+            <span className="text-xs font-medium text-[#434654]">ມະຫາວິທະຍາໄລແຫ່ງຊາດ</span>
+          </div>
         </Link>
 
         {/* Links */}

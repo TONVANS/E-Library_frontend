@@ -14,6 +14,9 @@
       "service": "e-library-frontend"
     }
   ],
+  // API_URL is set in the Cloudflare dashboard so the backend URL stays out of the repo;
+  // without this, every deploy deletes dashboard variables that aren't listed here
+  "keep_vars": true,
   "observability": {
     "enabled": true
   }

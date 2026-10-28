@@ -71,11 +71,11 @@ export default function HomePage() {
           </div>
 
           <h1 className="text-3xl md:text-5xl font-extrabold tracking-tight text-white mb-4 drop-shadow-md leading-tight">
-            ຄົ້ນພົບຄັງຄວາມຮູ້ ແລະ ບົດຄົ້ນຄວ້າ ມຊ
+            ຄົ້ນຫາ ບົດວິທະຍານິພົນຂອງ ຄະນະເສດຖະສາດ ແລະ ບໍລິຫານທຸລະກິດ
           </h1>
 
           <p className="text-base md:text-lg text-[#dae2ff] mb-8 max-w-2xl mx-auto opacity-95 leading-relaxed font-normal">
-            ເຂົ້າເຖິງບົດຄົ້ນຄວ້າວິທະຍາສາດ, ບົດວິທະຍານິພົນປະລິນຍາໂທ-ເອກ, ແລະ ວາລະສານວິຊາການ ຂອງຄູອາຈານ ແລະ ນັກສຶກສາ ມະຫາວິທະຍາໄລແຫ່ງຊາດ ຢ່າງສະດວກ ແລະ ປອດໄພ.
+            ເຂົ້າເຖິງບົດຄົ້ນຄວ້າວິທະຍາສາດ, ບົດວິທະຍານິພົນປະລິນຍາຕີ-ໂທ-ເອກ ແລະ ວາລະສານວິຊາການ ຂອງຄູອາຈານ ແລະ ນັກສຶກສາ ຄສບ ຢ່າງສະດວກ ແລະ ປອດໄພ
           </p>
 
           {/* Search Bar */}

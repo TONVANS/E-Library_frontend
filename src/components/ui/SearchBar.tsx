@@ -11,7 +11,7 @@ interface SearchBarProps {
 
 export function SearchBar({
   redirectOnSubmit = false,
-  placeholder = 'ຄົ້ນຫາເອກະສານ, ຊື່ຜູ້ຂຽນ, ຫົວຂໍ້ບົດຄົ້ນຄວ້າ, ຫຼື ຄຳສັບຫຼັກ...',
+  placeholder = 'ຄົ້ນຫາເອກະສານ, ຊື່ຜູ້ຂຽນ, ຫົວຂໍ້ບົດຄົ້ນຄວ້າ ຫຼື ຄຳສັບຫຼັກ...',
 }: SearchBarProps) {
   const router = useRouter();
   const { searchQuery, setSearchQuery } = useFilterStore();
